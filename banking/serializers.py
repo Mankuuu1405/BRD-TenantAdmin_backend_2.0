@@ -1,51 +1,44 @@
 from rest_framework import serializers
-from .models import Mandate
+from los.models import LoanApplication, BankDetail
 
+# ---------------------------------------
+# Serializer for LoanApplication / Dashboard
+# ---------------------------------------
+class BankingDashboardSerializer(serializers.ModelSerializer):
+    customer = serializers.CharField(source="customer.name")
+    bank = serializers.SerializerMethodField()
+    ifsc = serializers.SerializerMethodField()
+    account = serializers.SerializerMethodField()
 
-class MandateSerializer(serializers.ModelSerializer):
-    application_id = serializers.CharField(
-        source="loan_application.application_id",
-        read_only=True
-    )
+    def get_bank(self, obj):
+        return obj.bank_detail.bank_name if obj.bank_detail else None
 
-    customer_name = serializers.CharField(
-        source="loan_application.customer.full_name",
-        read_only=True
-    )
+    def get_ifsc(self, obj):
+        return obj.bank_detail.ifsc_code if obj.bank_detail else None
 
-    penny_drop_status_label = serializers.CharField(
-        source="get_penny_drop_status_display",
-        read_only=True
-    )
-
-    enach_status_label = serializers.CharField(
-        source="get_enach_status_display",
-        read_only=True
-    )
-
-    bank_details = serializers.SerializerMethodField()
+    def get_account(self, obj):
+        return obj.bank_detail.account_number if obj.bank_detail else None
 
     class Meta:
-        model = Mandate
+        model = LoanApplication
         fields = [
             "id",
-            "application_id",
-            "customer_name",
-            "bank_details",
-            "penny_drop_status",
-            "penny_drop_status_label",
-            "enach_status",
-            "enach_status_label",
+            "customer",
+            "bank",
+            "ifsc",
+            "account",
         ]
 
-    def get_bank_details(self, obj):
-        bank_detail = getattr(obj.loan_application, "bank_detail", None)
-        if not bank_detail:
-            return None
-        
-        return {
-        "bank_name": bank_detail.bank_name,
-        "account_number": bank_detail.account_number,
-        "ifsc_code": bank_detail.ifsc_code,
-    }
+# ---------------------------------------
+# Serializer for BankDetail (masked account)
+# ---------------------------------------
+class BankAccountOnlySerializer(serializers.ModelSerializer):
+    account_number = serializers.SerializerMethodField()
 
+    class Meta:
+        model = BankDetail
+        fields = ["account_number"]
+
+    def get_account_number(self, obj):
+        # Mask all but last 4 digits for privacy
+        return f"XXXXXX{obj.account_number[-4:]}" if obj.account_number else None

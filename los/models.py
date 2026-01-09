@@ -137,9 +137,9 @@ class BankDetail(models.Model):
         related_name='bank_detail'
     )
 
-    account_number = models.CharField(max_length=20, default='0000000000')
-    ifsc_code = models.CharField(max_length=11, default='UNKNOWNIFSC')
-    bank_name = models.CharField(max_length=255, default='Unknown Bank')
+    account_number = models.CharField(max_length=20)
+    ifsc_code = models.CharField(max_length=11)
+    bank_name = models.CharField(max_length=255)
     branch_name = models.CharField(max_length=255, null=True, blank=True)
 
     penny_drop_status = models.CharField(max_length=20, default='PENDING')

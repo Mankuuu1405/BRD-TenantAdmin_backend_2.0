@@ -1,42 +1,33 @@
-# models.py
 from django.db import models
-from django.utils import timezone
+from los.models import LoanApplication
 
 class Mandate(models.Model):
-
-    class PennyDropStatus(models.TextChoices):
-        PENDING = "PENDING", "Pending"
-        SUCCESS = "SUCCESS", "Success"
-        FAILED = "FAILED", "Failed"
-
-    class ENachStatus(models.TextChoices):
-        NOT_REGISTERED = "NOT_REGISTERED", "Not Registered"
-        REGISTERED = "REGISTERED", "Registered"
-        SUCCESS = "SUCCESS", "Success"
-        FAILED = "FAILED", "Failed"
+    STATUS_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('SUCCESS', 'Success'),
+        ('FAILED', 'Failed'),
+    )
 
     loan_application = models.OneToOneField(
-        "los.LoanApplication",
+        LoanApplication,
         on_delete=models.CASCADE,
         related_name="mandate"
     )
 
     penny_drop_status = models.CharField(
-        max_length=20,
-        choices=PennyDropStatus.choices,
-        default=PennyDropStatus.PENDING
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='PENDING'
     )
 
     enach_status = models.CharField(
-        max_length=20,
-        choices=ENachStatus.choices,
-        default=ENachStatus.NOT_REGISTERED
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='PENDING'
     )
 
-    verified_at = models.DateTimeField(null=True, blank=True)
-
-    created_at = models.DateTimeField(default=timezone.now)  # ✅ MIGRATION SAFE
+    failure_reason = models.TextField(blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Mandate - LoanApp {self.loan_application_id}"
+        return f"Mandate - {self.loan_application.id}"
