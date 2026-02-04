@@ -4,12 +4,6 @@ from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 
 from adminpanel.models import Subscription
-class User(AbstractUser):
-    # You can extend User with email as username
-    email = models.EmailField(unique=True)
-
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
 
 class Tenant(models.Model):
     tenant_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)

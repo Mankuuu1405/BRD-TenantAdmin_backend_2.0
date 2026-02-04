@@ -5,8 +5,9 @@ class Mandate(models.Model):
     STATUS_CHOICES = (
         ('PENDING', 'Pending'),
         ('SUCCESS', 'Success'),
-        ('FAILED', 'Failed'),
+        ('FAILED', 'fail'),
     )
+    
 
     loan_application = models.OneToOneField(
         LoanApplication,
@@ -20,11 +21,19 @@ class Mandate(models.Model):
         default='PENDING'
     )
 
+
     enach_status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
         default='PENDING'
     )
+
+    action = models.CharField(  
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='PENDING'
+    )
+
 
     failure_reason = models.TextField(blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -33,12 +33,6 @@ class LoanApplication(models.Model):
         ('CLOSED', 'Closed'),
     )
 
-    BORROWER_TYPE_CHOICES = (
-        ("INDIVIDUAL", "Individual"),
-        ("PARTNERSHIP", "Partnership Firm"),
-        ("CORPORATE", "Corporate"),
-    )
-
     INCOME_TYPE_CHOICES = (
         ("SALARIED", "Salaried"),
         ("SELF_EMPLOYED", "Self Employed"),
@@ -51,7 +45,7 @@ class LoanApplication(models.Model):
     application_number = models.CharField(
         max_length=50,
         unique=True,
-        default=generate_application_number,  # callable for unique value
+        default=generate_application_number,
         editable=False
     )
 
@@ -71,21 +65,9 @@ class LoanApplication(models.Model):
     requested_tenure = models.IntegerField(help_text="Months")
     monthly_income = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
-    # -------------------------
-    # BORROWER INFO
-    # -------------------------
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    mobile_no = models.CharField(max_length=15)
-    email = models.EmailField()
-    dob = models.DateField()
-    gender = models.CharField(max_length=10, choices=(('M', 'Male'), ('F', 'Female'), ('O', 'Other')))
-    pan_number = models.CharField(max_length=10)
-    aadhaar_number = models.CharField(max_length=12, null=True, blank=True)
-    borrower_type = models.CharField(max_length=20, choices=BORROWER_TYPE_CHOICES)
     income_type = models.CharField(max_length=20, choices=INCOME_TYPE_CHOICES)
-    employer_name = models.CharField(max_length=255, null=True, blank=True)
-    business_name = models.CharField(max_length=255, null=True, blank=True)
+    employer_name = models.CharField(max_length=255, blank=True)
+    business_name = models.CharField(max_length=255, blank=True)
 
     # -------------------------
     # ADDRESS INFO
@@ -102,12 +84,7 @@ class LoanApplication(models.Model):
     # SYSTEM INFO
     # -------------------------
     remarks = models.TextField(null=True, blank=True)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -131,20 +108,13 @@ class LoanApplication(models.Model):
 # BANK DETAIL
 # ============================================
 class BankDetail(models.Model):
-    loan_application = models.OneToOneField(
-        LoanApplication,
-        on_delete=models.CASCADE,
-        related_name='bank_detail'
-    )
-
+    loan_application = models.OneToOneField(LoanApplication, on_delete=models.CASCADE, related_name='bank_detail')
     account_number = models.CharField(max_length=20)
     ifsc_code = models.CharField(max_length=11)
     bank_name = models.CharField(max_length=255)
     branch_name = models.CharField(max_length=255, null=True, blank=True)
-
     penny_drop_status = models.CharField(max_length=20, default='PENDING')
     enach_status = models.CharField(max_length=20, default='NOT_REGISTERED')
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -169,11 +139,7 @@ class KYCDetail(models.Model):
         ('ENCUMBRANCE_CERT', 'Encumbrance Certificate'),
     )
 
-    loan_application = models.ForeignKey(
-        LoanApplication,
-        on_delete=models.CASCADE,
-        related_name="documents"
-    )
+    loan_application = models.ForeignKey(LoanApplication, on_delete=models.CASCADE, related_name="documents")
     kyc_type = models.CharField(max_length=50, choices=KYC_TYPES)
     document_file = models.FileField(upload_to='kyc/')
     status = models.CharField(max_length=20, default='PENDING')
@@ -186,9 +152,7 @@ class KYCDetail(models.Model):
 # ============================================
 # PROPERTY DETAIL
 # ============================================
-
 class PropertyDetail(models.Model):
-
     PROPERTY_TYPE_CHOICES = [
         ('HOUSE', 'House'),
         ('FLAT', 'Flat / Apartment'),
@@ -197,17 +161,8 @@ class PropertyDetail(models.Model):
         ('COMMERCIAL', 'Commercial Property'),
     ]
 
-    loan_application = models.OneToOneField(
-        LoanApplication,
-        on_delete=models.CASCADE,
-        related_name='property_detail'
-    )
-
-    property_type = models.CharField(
-        max_length=30,
-        choices=PROPERTY_TYPE_CHOICES
-    )
-
+    loan_application = models.OneToOneField(LoanApplication, on_delete=models.CASCADE, related_name='property_detail')
+    property_type = models.CharField(max_length=30, choices=PROPERTY_TYPE_CHOICES)
     address = models.TextField()
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
@@ -216,7 +171,6 @@ class PropertyDetail(models.Model):
 
     class Meta:
         db_table = "property_details"
-
 
 
 # ============================================
@@ -230,11 +184,7 @@ class CreditAssessment(models.Model):
         ("MANUAL_REJECTED", "Manual Rejected"),
     )
 
-    application = models.OneToOneField(
-        LoanApplication,
-        on_delete=models.CASCADE,
-        related_name="credit_assessment"
-    )
+    application = models.OneToOneField(LoanApplication, on_delete=models.CASCADE, related_name="credit_assessment")
     status = models.CharField(max_length=30, choices=DECISION_CHOICES)
     remarks = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -251,12 +201,7 @@ class CreditAssessment(models.Model):
 # MORTGAGE UNDERWRITING
 # ============================================
 class MortgageUnderwriting(models.Model):
-    loan_application = models.OneToOneField(
-        LoanApplication,
-        on_delete=models.CASCADE,
-        related_name='mortgage_underwriting'
-    )
-
+    loan_application = models.OneToOneField(LoanApplication, on_delete=models.CASCADE, related_name='mortgage_underwriting')
     property_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     ltv_on_property = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     final_eligible_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0)

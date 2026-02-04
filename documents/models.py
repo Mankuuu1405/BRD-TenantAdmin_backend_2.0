@@ -1,5 +1,4 @@
 from django.db import models
-from tenants.models import Tenant
 from crm.models import Customer
 
 
@@ -14,10 +13,25 @@ DOCUMENT_TYPE_CHOICES = [
 
 
 class Document(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, null=True, blank=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
+    tenant = models.ForeignKey(
+        "tenants.Tenant",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
-    document_type = models.CharField(max_length=50, choices=DOCUMENT_TYPE_CHOICES, default='OTHERS')
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    document_type = models.CharField(
+        max_length=50,
+        choices=DOCUMENT_TYPE_CHOICES,
+        default='OTHERS'
+    )
     uploaded_by = models.CharField(max_length=100, blank=True)
     file = models.FileField(upload_to='documents/%Y/%m/%d/')
     purpose = models.CharField(max_length=200, blank=True)

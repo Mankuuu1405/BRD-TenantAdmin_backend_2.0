@@ -80,29 +80,34 @@ class MortgageUnderwritingInline(admin.StackedInline):
 # ============================================================
 @admin.register(LoanApplication)
 class LoanApplicationAdmin(admin.ModelAdmin):
-
     list_display = (
         "application_id",
-        "first_name",
-        "mobile_no",
+        "customer",
+        "requested_amount",
         "status",
         "created_at",
     )
 
     list_display_links = ("application_id",)
-    list_filter = ("status", "income_type", "product")
+
+    list_filter = (
+        "status",
+        "created_at",
+    )
+
     search_fields = (
         "application_id",
+        "application_number",
         "customer__first_name",
         "customer__last_name",
-        "pan_number",
-        "mobile_no",
+        "customer__mobile_no",
     )
 
     readonly_fields = (
-        'application_id',
-        'created_at',
-    )   
+        "application_id",
+        "application_number",
+        "created_at",
+    )
 
     inlines = [
         KYCDetailInline,

@@ -1,11 +1,40 @@
 from rest_framework import serializers
-from .models import Disbursement  # only the actual model
+from .models import Disbursement
 
-class DisbursementSerializer(serializers.ModelSerializer):
-    bank_name = serializers.CharField(source='mandate.bank_name', read_only=True)
-    account_number = serializers.CharField(source='mandate.account_number', read_only=True)
-    ifsc_code = serializers.CharField(source='mandate.ifsc_code', read_only=True)
+class DisbursementQueueSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="loan_application.id")
+    name = serializers.SerializerMethodField()
+    bank = serializers.SerializerMethodField()
+    ifsc = serializers.SerializerMethodField()
 
     class Meta:
         model = Disbursement
-        fields = '__all__'
+        fields = [
+            "id",
+            "name",
+            "amount",
+            "bank",
+            "ifsc",
+        ]
+
+    def get_name(self, obj):
+        la = obj.loan_application
+        return (
+            getattr(la, "applicant_name", None)
+            or getattr(la, "customer_name", None)
+            or getattr(la, "full_name", "")
+        )
+
+    def get_bank(self, obj):
+        la = obj.loan_application
+        return (
+            getattr(la, "bank_name", None)
+            or getattr(la, "bank", "")
+        )
+
+    def get_ifsc(self, obj):
+        la = obj.loan_application
+        return (
+            getattr(la, "ifsc_code", None)
+            or getattr(la, "ifsc", "")
+        )

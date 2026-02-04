@@ -1,49 +1,38 @@
+from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from los.models import LoanApplication
+from rest_framework import status
+
+from .models import Disbursement
+from .serializers import DisbursementQueueSerializer
 
 
-# ============================
-# DISBURSEMENT QUEUE (GET)
-# ============================
-class DisbursementQueueAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+class DisbursementQueueAPIView(ListAPIView):
+    serializer_class = DisbursementQueueSerializer
 
-    def get(self, request):
-        applications = LoanApplication.objects.filter(
-            status='PRE_DISBURSEMENT'
-        )
-
-        data = []
-        for app in applications:
-            data.append({
-                "id": app.id,
-                "applicant_name": f"{app.first_name} {app.last_name}",
-                "sanctioned_amount": app.requested_amount,
-            })
-
-        return Response(data)
+    def get_queryset(self):
+        return Disbursement.objects.all()
 
 
-# ============================
-# DISBURSE LOAN (POST)
-# ============================
 class DisburseLoanAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def post(self, request, application_id):
-        loan = get_object_or_404(LoanApplication, id=application_id)
-
-        # Safety check
-        if loan.status != 'PRE_DISBURSEMENT':
-            return Response(
-                {"error": "Loan is not ready for disbursement"},
-                status=400
+        try:
+            disbursement = Disbursement.objects.get(
+                loan_application__id=application_id
             )
 
-        loan.status = 'DISBURSED'
-        loan.save()
+            # mock success
+            disbursement.penny_drop_status = "SUCCESS"
+            disbursement.enach_status = "SUCCESS"
+            disbursement.save()
 
-        return Response({"message": "Loan disbursed successfully"})
+            return Response(
+                {"message": "Disbursement successful"},
+                status=status.HTTP_200_OK
+            )
+
+        except Disbursement.DoesNotExist:
+            return Response(
+                {"error": "Disbursement not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
