@@ -1,28 +1,28 @@
-# lms/serializers.py
 from rest_framework import serializers
-from .models import LoanAccount, Repayment, Collection
-from los.serializers import LoanApplicationSerializer  # optional nested representation if needed
+from .models import LoanAccount
 
-class RepaymentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Repayment
-        fields = ['id', 'loan_account', 'amount', 'paid_at', 'transaction_reference']
-        read_only_fields = ['id', 'paid_at', 'transaction_reference']
 
-class CollectionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Collection
-        fields = ['id', 'loan_account', 'collector', 'amount', 'collected_at']
-        read_only_fields = ['id', 'collected_at']
+class LoanAccountListSerializer(serializers.ModelSerializer):
+    # LMS field: disbursement → API field: loan_account_id
+    loan_account_id = serializers.UUIDField(
+        source="disbursement",
+        read_only=True
+    )
 
-class LoanAccountSerializer(serializers.ModelSerializer):
-    repayments = RepaymentSerializer(many=True, read_only=True)
-    collections = CollectionSerializer(many=True, read_only=True)
+    # LMS field: principal → API field: principal_amount
+    principal_amount = serializers.DecimalField(
+        source="principal",
+        max_digits=14,
+        decimal_places=2,
+        read_only=True
+    )
 
     class Meta:
         model = LoanAccount
         fields = [
-            'id', 'loan_application', 'account_id', 'emi_amount', 'interest_rate',
-            'outstanding_principal', 'disbursed_at', 'tenor_months', 'repayments', 'collections'
+            "loan_account_id",
+            "principal_amount",
+            "outstanding_principal",
+            "status",
+            "created_at",
         ]
-        read_only_fields = ['id', 'disbursed_at', 'outstanding_principal']

@@ -12,7 +12,7 @@ from user.permissions import DefaultPermission
 from tenants.models import Tenant, Branch
 from django.contrib.auth import get_user_model  # ✅ Use get_user_model
 from los.models import LoanApplication
-from lms.models import LoanAccount, Repayment
+from lms.models import LoanAccount
 from crm.models import LeadActivity
 
 User = get_user_model() # ✅ Correct way to get User model
