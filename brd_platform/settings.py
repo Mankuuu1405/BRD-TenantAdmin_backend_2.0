@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "branches",
     "businesses",
     "escalation",
+    
     "banking",
     "ticket",
     "engine",
@@ -54,6 +55,8 @@ INSTALLED_APPS = [
     "frontend_mock",
     "communications",
     "compliance",
+    "tenantuser",
+    "loan_collections",
     "channel_partners",
     "adminpanel",
     "partners",
