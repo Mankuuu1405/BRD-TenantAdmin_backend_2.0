@@ -8,7 +8,7 @@ import datetime
 
 from .models import Report, Analytics
 from .serializers import ReportSerializer, AnalyticsSerializer
-from users.permissions import DefaultPermission
+from user.permissions import DefaultPermission
 from tenants.models import Tenant, Branch
 from django.contrib.auth import get_user_model  # ✅ Use get_user_model
 from los.models import LoanApplication

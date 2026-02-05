@@ -2,34 +2,58 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from rest_framework.authtoken.views import obtain_auth_token
+
+urlpatterns = [
+    path('api/token/', obtain_auth_token, name='api_token_auth'),
+]
 from .views import home
-from users.views import CustomTokenObtainPairView, MasterAdminLoginView, TenantLoginView
-# from adminpanel.views import SettingsView
+from user.views import login_view
+
+
+admin.site.site_header = "Loan Administration"
+admin.site.site_title = "Loan Admin Portal"
+admin.site.index_title = "Welcome to Loan Admin Dashboard"
 
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    # Authentication
-    # path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/master/", MasterAdminLoginView.as_view()),
-    path("api/token/tenant/", TenantLoginView.as_view()),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path('', include('user.urls')),
 
-    # App URLs
-    path("api/v1/tenants/", include("tenants.urls")),
-    path("api/v1/users/", include("users.urls")),
+    # ✅ Authentication (SESSION BASED)
+    path('login/', login_view, name='login'),
+
+    # ✅ App URLs
     path("api/v1/crm/", include("crm.urls")),
+    path("api/v1/user/", include("user.urls")),
+    path("api/v1/tenant/", include("tenants.urls")),
     path("api/v1/integrations/", include("integrations.urls")),
-    # path("settings/", SettingsView.as_view(), name="settings"),
 
-    
-    # 👇 These are the admin, comms, and LOS modules
     path("api/v1/adminpanel/", include("adminpanel.urls")),
     path("api/v1/communications/", include("communications.urls")),
     path("api/v1/los/", include("los.urls")),
-    path('api/v1/banking/', include('banking.urls')),
-    path("api/v1/", include("reporting.urls")), 
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("api/v1/banking/", include("banking.urls")),
+    path("api/v1/disbursement/", include("disbursement.urls")),
+    path("api/v1/reporting/", include("reporting.urls")),
+  
+    path("api/v1/branches/", include("branches.urls")),
+    path("api/v1/risk_engine/", include("risk_engine.urls")),
+    path("api/v1/escalation/", include("escalation.urls")),
+    path("api/v1/ticket/", include("ticket.urls")),
+    path("api/v1/channel_partners/", include("channel_partners.urls")),
+    path("api/v1/product/", include("product.urls")),
+    path("api/v1/role/", include("role.urls")),
+    path("api/v1/product/", include("product.urls")),
+    path("api/v1/engine/", include("engine.urls")),
+    path("api/v1/internal/", include("internal.urls")),
+    path("api/v1/subscriptions/", include("subscriptions.urls")),
+    path("api/v1/businesses/", include("businesses.urls")),
+    path("api/v1/system_settings/", include("system_settings.urls")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

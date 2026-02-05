@@ -30,19 +30,34 @@ INSTALLED_APPS = [
 
     # Local apps
     "tenants",
-    "users",
+    "user",
     "crm",
     "integrations",
     "lms",
     "los",
+    "product",
+    "risk_engine",
+    "internal",
+   
+    "system_settings",
+    "finance",
+    "branches",
+    "businesses",
+    "escalation",
     "banking",
+    "ticket",
+    "engine",
+    "disbursement",
     "reporting",
+    "subscriptions",
     "documents",
     "frontend_mock",
     "communications",
     "compliance",
+    "channel_partners",
     "adminpanel",
-    
+    "partners",
+    "role"
 ]
 
 
@@ -113,10 +128,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = 'user.User'
+
 
 AUTHENTICATION_BACKENDS = [
-    "users.backends.EmailBackend",          # your custom backend
+    "user.backends.EmailBackend",          # your custom backend
     "django.contrib.auth.backends.ModelBackend",
     "axes.backends.AxesBackend",             # always last
 ]

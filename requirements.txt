@@ -13,5 +13,3 @@ python-decouple==3.8
 django==4.2.7
 django-filter
 django-axes
-django pyotp
-django qrcode
