@@ -2,89 +2,43 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-
 User = get_user_model()
 
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = 'email'  # Use email instead of username
-    
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        
-        # Add custom claims
-        token['email'] = user.email
-        
-        return token
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
-
 class UserSerializer(serializers.ModelSerializer):
     """
-    Serializer for user model - used for retrieving user data.
+    Serializer for user model - handles all user fields
     """
+    # Use source to map frontend fields to backend fields
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
+    phone = serializers.CharField(required=False, allow_blank=True, source='phone_number')
+    mobile_no = serializers.CharField(required=False, allow_blank=True, source='phone_number', write_only=True)
+    
+    # Additional fields from your frontend
+    tenant = serializers.IntegerField(required=False, allow_null=True)
+    tenant_id = serializers.IntegerField(required=False, allow_null=True, source='tenant')
+    role = serializers.CharField(required=False, allow_blank=True)
+    role_type = serializers.CharField(required=False, allow_blank=True, source='role')
+    role_id = serializers.IntegerField(required=False, allow_null=True)
+    
+    # Supervisor fields
+    supervisor_name = serializers.CharField(required=False, allow_blank=True)
+    supervisor_email = serializers.EmailField(required=False, allow_blank=True)
+    supervisor_mobile = serializers.CharField(required=False, allow_blank=True)
+    
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'phone_number', 
-                  'bio', 'avatar', 'date_joined', 'is_active')
-        read_only_fields = ('id', 'date_joined', 'is_active')
+        fields = (
+            'id', 'email', 'first_name', 'last_name', 'phone', 'mobile_no',
+            'tenant', 'tenant_id', 'role', 'role_type', 'role_id',
+            'supervisor_name', 'supervisor_email', 'supervisor_mobile',
+            'is_active', 'password'
+        )
+        read_only_fields = ('id',)
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
-
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    """
-    Serializer for user registration.
-    """
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
-    
-    class Meta:
-        model = User
-        fields = ('email', 'password', 'password2', 'first_name', 'last_name', 'phone_number')
-    
-    def validate(self, attrs):
-        """
-        Validate that the two password fields match.
-        """
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
-        return attrs
-    
-    def create(self, validated_data):
-        """
-        Create a new user with encrypted password.
-        """
-        validated_data.pop('password2')
-        user = User.objects.create_user(**validated_data)
-        return user
-
-
-class ChangePasswordSerializer(serializers.Serializer):
-    """
-    Serializer for password change endpoint.
-    """
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True, validators=[validate_password])
-    new_password2 = serializers.CharField(required=True)
-    
-    def validate(self, attrs):
-        """
-        Validate that the two new password fields match.
-        """
-        if attrs['new_password'] != attrs['new_password2']:
-            raise serializers.ValidationError({"new_password": "New password fields didn't match."})
-        return attrs
-
-
-class UserUpdateSerializer(serializers.ModelSerializer):
-    """
-    Serializer for updating user profile information.
-    """
-    
-    class Meta:
-        model = User
-        fields = ('first_name', 'last_name', 'phone_number', 'bio', 'avatar')

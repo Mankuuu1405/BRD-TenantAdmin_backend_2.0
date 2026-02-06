@@ -178,16 +178,27 @@ class TenantTokenSerializer(TokenObtainPairSerializer):
 
         refresh = self.get_token(user)
 
+        tenant = getattr(user, "tenant", None)
+
         return {
             "refresh": str(refresh),
             "access": str(refresh.access_token),
+
+            # ✅ Tenant info
+            "tenant_id": tenant.id if tenant else None,                  # INTEGER (DB ID)
+            "tenant_uuid": str(tenant.tenant_id) if tenant else None,    # UUID
+            "tenant_name": tenant.name if tenant else None,
+
+            # Optional user info
             "user": {
                 "id": user.id,
                 "email": user.email,
-                "tenant_id": str(user.tenant.tenant_id) if hasattr(user, "tenant") else None,
                 "role": getattr(user, "role", None),
             }
         }
+
+
+
 
 # -----------------------------
 # FINANCIAL, REPORTING & HOLIDAY
