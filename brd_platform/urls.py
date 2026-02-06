@@ -48,7 +48,7 @@ urlpatterns = [
     path("api/v1/tenantuser/", include("tenantuser.urls")),
     path("api/v1/risk_engine/", include("risk_engine.urls")),
     path("api/v1/escalation/", include("escalation.urls")),
-    path("api/v1/ticket/", include("ticket.urls")),
+    path("api/v1/support/", include("ticket.urls")),
     path("api/v1/channel_partners/", include("channel_partners.urls")),
     path("api/v1/role/", include("role.urls")),
     path("api/v1/product/", include("product.urls")),
