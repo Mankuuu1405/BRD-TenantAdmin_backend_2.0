@@ -50,6 +50,7 @@ urlpatterns = [
     path("api/v1/escalation/", include("escalation.urls")),
     path("api/v1/support/", include("ticket.urls")),
     path("api/v1/channel_partners/", include("channel_partners.urls")),
+    path("api/v1/third_party/", include("partners.urls")),
     path("api/v1/role/", include("role.urls")),
     path("api/v1/product/", include("product.urls")),
     path("api/v1/engine/", include("engine.urls")),
