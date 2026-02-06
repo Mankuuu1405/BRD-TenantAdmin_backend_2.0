@@ -6,12 +6,12 @@ class Role(models.Model):
     # ---------------------------
     # Role Type & Status
     # ---------------------------
-    ROLE_TYPE = (
+    ROLE_STATUS = (
         ("active", "Active"),
         ("inactive", "Inactive"),
     )
 
-    ROLE_STATUS = (
+    ROLE_TYPE = (
         ("ADMIN", "Admin"),
         ("MANAGER", "Manager"),
         ("CUSTOM", "Custom Role"),
@@ -23,7 +23,7 @@ class Role(models.Model):
     role_type = models.CharField(max_length=20, choices=ROLE_TYPE)
     role_name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=ROLE_STATUS, default="active")
+    role_status = models.CharField(max_length=10, choices=ROLE_STATUS)
     created_at = models.DateTimeField(auto_now_add=True)
 
     # ---------------------------

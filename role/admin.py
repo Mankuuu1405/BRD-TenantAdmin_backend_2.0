@@ -6,10 +6,10 @@ class RoleAdmin(admin.ModelAdmin):
     list_display = (
         "role_name",
         "role_type",
-        "status",
+        "role_status",
         "created_at",
     )
-    list_filter = ("status", "role_type")
+    list_filter = ("role_status", "role_type")
     search_fields = ("role_name", "description")
     ordering = ("-created_at",)
     readonly_fields = ("created_at",)
@@ -20,7 +20,7 @@ class RoleAdmin(admin.ModelAdmin):
                 "role_type",
                 "role_name",
                 "description",
-                "status",
+                "role_status",
             )
         }),
         ("Permissions", {
