@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     "channel_partners",
     "adminpanel",
     "partners",
-    "role"
+    "role",
 ]
 
 
